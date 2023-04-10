@@ -22,7 +22,7 @@ static char *mem_max_addr;   /* largest legal heap address */
 /* 
  * mem_init - initialize the memory system model
  */
-void mem_init(void)
+void mem_init(void)             // 최대 힙 메모리 공간을 할당받고 초기화해준다.
 {
     /* allocate the storage we will use to model the available VM */
     if ((mem_start_brk = (char *)malloc(MAX_HEAP)) == NULL) {
@@ -37,7 +37,7 @@ void mem_init(void)
 /* 
  * mem_deinit - free the storage used by the memory system model
  */
-void mem_deinit(void)
+void mem_deinit(void)       
 {
     free(mem_start_brk);
 }
@@ -55,17 +55,19 @@ void mem_reset_brk()
  *    by incr bytes and returns the start address of the new area. In
  *    this model, the heap cannot be shrunk.
  */
-void *mem_sbrk(int incr) 
+void *mem_sbrk(int incr)        // byte 단위로 필요 메모리 크기를 입력받아 그 크기만큼 힙을 늘려주고, 새 메모리의 시작 지점을 리턴한다.
 {
-    char *old_brk = mem_brk;
+    char *old_brk = mem_brk;    // 힙 늘이기 전의 끝 포인터를 저장한다.
 
+    // 힙이 줄어들거나 최대 힙 사이즈를 벗어난다면
+    // 메모리 부족으로 에러처리 하고 -1을 리턴한다.
     if ( (incr < 0) || ((mem_brk + incr) > mem_max_addr)) {
-	errno = ENOMEM;
+	errno = ENOMEM;             // 메모리 부족 에러 처리
 	fprintf(stderr, "ERROR: mem_sbrk failed. Ran out of memory...\n");
-	return (void *)-1;
+	return (void *)-1;          // 리턴값이 void*여야 해서 형변환
     }
-    mem_brk += incr;
-    return (void *)old_brk;
+    mem_brk += incr;            // mem_brk에 incr만큼 더함으로써 힙을 늘려주었다.
+    return (void *)old_brk;     // 이전 brk를 리턴한다. 왜? 이 새로운 메모리를 처음부터 사용해야 하니까.
 }
 
 /*
