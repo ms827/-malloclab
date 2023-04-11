@@ -319,7 +319,8 @@ void *mm_realloc(void *ptr, size_t size)
 static void *find_fit(size_t asize) 
 {
     void *bp;
-
+    // 프롤로그 블록에서 에필로그 블록 전까지 블록 포인터 bp를 탐색한다.
+    // 블록이 가용 상태이고 사이즈가 요구 사이즈보다 크다면 해당 블록 포인터를 리턴
     for (bp = heap_listp; GET_SIZE(HDRP(bp)) > 0; bp = NEXT_BLKP(bp)) {
         if (!GET_ALLOC(HDRP(bp)) && (asize <= GET_SIZE(HDRP(bp)))) {
             return bp;
